@@ -1,71 +1,48 @@
-#!/usr/bin env pythonu3
+#!/usr/bin/env python3
 """
 Adds `get_page` method to `Server` class
 """
-
-import cs
-from typing import List, Optional
-
-
-def index_range(page: int, page_size: int) -> tuple:
-    """
-    Returns a tuple containing the start index and end index for pagination.
-
-    Parameters:
-    - page (int): The page number (1-indexed).
-    - page_size (int): The size of each page.
-
-    Returns:
-    - tuple: A tuple containing the start index and end index.
-    """
-    start_index = (page - 1) * page_size
-    end_index = start_index + page_size
-    return start_index, end_index
+import csv
+from typing import List, Tuple
 
 
 class Server:
-    """Server class to paginate a database of popular baby names."""
-
+    """Server class to paginate a database of popular baby names.
+    """
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
-        self.__dataset: Optional[List[List]] = None
+        self.__dataset = None
 
     def dataset(self) -> List[List]:
-        """Cached dataset"""
+        """Cached dataset
+        """
         if self.__dataset is None:
             with open(self.DATA_FILE) as f:
                 reader = csv.reader(f)
                 dataset = [row for row in reader]
-            self.__dataset = dataset[1:]  # Skip header row
+            self.__dataset = dataset[1:]
 
         return self.__dataset
 
+    @staticmethod
+    def index_range(page: int, page_size: int) -> Tuple[int, int]:
+        """Calculate start and end index range for a `page`, with `page_size`
+        """
+        nextPageStartIndex = page * page_size
+        return nextPageStartIndex - page_size, nextPageStartIndex
+
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
         """
-        Returns a page of the dataset.
-
-        Parameters:
-        - page (int): The page number (default is 1).
-        - page_size (int): The number of items per page (default is 10).
-
+        Get items for the given page number
+        Args:
+            page (int): page number
+            page_size (int): number of items per page
         Returns:
-        - List[List]: A list of lists representing a page from the dataset.
+            (List[List]): a list of list(row) if inputs are within range
+            ([]) : an empty list if page and page_size are out of range
         """
-        # Ensure page and page_size are valid
-        assert isinstance(page, int) and page > 0, "Page number must be a positive integer."
-        assert isinstance(page_size, int) and page_size > 0, "Page size must be a positive integer."
-
-        # Get dataset
-        dataset = self.dataset()
-
-        # Get the index range for the current page
-        start_idx, end_idx = index_range(page, page_size)
-
-        # Return the appropriate page of the dataset
-        if start_idx >= len(dataset):
-            return []
-
-        return dataset[start_idx:end_idx]
-
-
+        assert type(page) == int and type(page_size) == int
+        assert page > 0 and page_size > 0
+        startIndex, endIndex = self.index_range(page, page_size)
+        return self.dataset()[startIndex:endIndex]
