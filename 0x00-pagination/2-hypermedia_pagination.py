@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
+"""
+Adds `get_hyper` method to `Server` class
+"""
+
 import csv
-import math
-from typing import List, Optional, Dict
+from typing import Dict, List, Tuple, Union
+
 
 
 def index_range(page: int, page_size: int) -> tuple:
